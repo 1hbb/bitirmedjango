@@ -23,7 +23,9 @@ def index(request):
 
     x = randomCoordinates(float(lat), float(lng))
     calculateDistanceArray(float(lat), float(lng))
-    return HttpResponse(json.dumps(x), content_type="application/json")
+    response = HttpResponse(json.dumps(x), content_type="application/json")
+    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+    return response;
 
 
 cred=credentials.Certificate('service.json')
