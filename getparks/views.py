@@ -20,9 +20,10 @@ def index(request):
     USER_LAT = lat
     USER_LNG = lng
     print(f'user lat = {lat} user lang = {lng}')
+    
+    x = randomCoordinates(float(lat), float(lng)) 
+    
 
-    x = randomCoordinates(float(lat), float(lng))
-    calculateDistanceArray(float(lat), float(lng))
     response = HttpResponse(json.dumps(x), content_type="application/json")
     response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
     return response;
@@ -45,6 +46,7 @@ lngArray=[]
 traficJam=[]
 distance_Array=[]
 capcityArray=[]
+bestParkingSpots=[]
 enMantikliArray=[]
 def randomCoordinates(usr_lat, usr_lng):
     latArray.clear()
@@ -54,8 +56,8 @@ def randomCoordinates(usr_lat, usr_lng):
     cpcity=0
     lng=0
     for i in range(0,PARKS):
-        yon=random.random()
-        lat=random.random()
+        yon=random.random()/2
+        lat=random.random()/2
         lng= random.random()
         jam=random.randint(1,100)
         cpcity=random.randint(1,50)
@@ -85,10 +87,16 @@ def randomCoordinates(usr_lat, usr_lng):
     print(lngArray)
     print(f'jam={traficJam}')
     print(f'kapasite={capcityArray}')
-    return {
-        "latArray" : latArray,
-        "lngArray": lngArray,
-    }
+
+    res = []
+    calculateDistanceArray(float(usr_lat), float(usr_lng))
+    findBestParkingSpot()
+
+    for (lat,lng,cap,bestValue) in zip(latArray, lngArray,capcityArray,bestParkingSpots):
+        res.append({"lat": lat, "lng": lng,"cap":cap,"best":bestValue})
+
+    return res
+    
    
    
 def distance(lat1, lat2, lon1, lon2):
@@ -114,8 +122,24 @@ def distance(lat1, lat2, lon1, lon2):
     return(c * r)
 
 def calculateDistanceArray(usr_lat, usr_lng):
-
+    distance_Array.clear()
     for i in range (0,PARKS):
-       distance_Array.append(distance(usr_lng,latArray[i],usr_lng,lngArray[i]))
+        print(i)
+        distance_Array.append(distance(usr_lat,latArray[i],usr_lng,lngArray[i]))
     
     print(f'km={distance_Array}')
+    
+
+def findBestParkingSpot():
+        bestParkingSpots.clear()
+        for i in range (0,PARKS):
+            bestParkingSpots.append(calculateBestSpot(distance_Array[i],traficJam[i],capcityArray[i]))
+        print(f'best={bestParkingSpots}')
+        return bestParkingSpots
+  
+
+def calculateBestSpot(km,jam,cpcty):
+## km düşük jam düşük kapasite yüksek olmalı bize bir değer üretmeli
+    sonuc=0
+    sonuc=((cpcty)/(jam))+((cpcty)/(km))
+    return sonuc
