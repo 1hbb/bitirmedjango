@@ -5,9 +5,6 @@ import json
 import random
 from math import radians, cos, sin, asin, sqrt
 from textwrap import indent
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
 
 # Create your views here.
 
@@ -27,16 +24,6 @@ def index(request):
     response = HttpResponse(json.dumps(x), content_type="application/json")
     response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
     return response;
-
-
-cred=credentials.Certificate('service.json')
-
-firebase_admin.initialize_app(cred,{
-
-    'databaseURL':'https://python-72e0a-default-rtdb.europe-west1.firebasedatabase.app/'
-})
-
-ref=db.reference('py/')
 
 
 
@@ -71,13 +58,7 @@ def randomCoordinates(usr_lat, usr_lng):
         traficJam.append(jam)
         capcityArray.append(cpcity)
        
-        ref.child(f'{i+1}').set({       
-            "lat":latArray[i],
-            "lng":lngArray[i],
-            'capacity':capcityArray[i],
-            "trafficJam":traficJam[i],
-            "yakinlik":0,
-        })
+        
         
       
      
